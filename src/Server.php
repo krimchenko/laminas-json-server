@@ -651,12 +651,22 @@ class Server extends AbstractServer
         $orderedParams = [];
         foreach ($reflection->getParameters() as $refParam) {
             if (array_key_exists($refParam->getName(), $requestedParams)) {
-                $orderedParams[$refParam->getName()] = $requestedParams[$refParam->getName()];
+                if(is_null($requestedParams[$refParam->getName()]) && $refParam->isDefaultValueAvailable()) {
+                    $orderedParams[$refParam->getName()] = $refParam->getDefaultValue();
+                }
+                else {
+                    $orderedParams[$refParam->getName()] = $requestedParams[$refParam->getName()];
+                }
                 continue;
             }
 
             if ($refParam->isOptional()) {
-                $orderedParams[$refParam->getName()] = null;
+                if($refParam->isDefaultValueAvailable()) {
+                    $orderedParams[$refParam->getName()] = $refParam->getDefaultValue();
+                }
+                else {
+                    $orderedParams[$refParam->getName()] = null;
+                }
                 continue;
             }
 
